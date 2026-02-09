@@ -1,0 +1,151 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>mcchat docs</title>
+    <link rel="stylesheet" href="./style.css" />
+  </head>
+  <body>
+    <div id="site-header"></div>
+
+    <section class="hero">
+      <div class="container">
+        <div class="hero-card">
+          <h1>mcchat</h1>
+          <p>Country + frequency chat channels for Paper/Folia. Players only see messages from others in the same channel.</p>
+          <div class="badges">
+            <span class="badge">paper / folia</span>
+            <span class="badge">sqlite storage</span>
+            <span class="badge">in-memory cache</span>
+            <span class="badge">channel filtering</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <main>
+      <div class="container">
+        <section id="overview" class="section">
+          <h2>overview</h2>
+          <div class="grid">
+            <div class="card">
+              <h3>what it does</h3>
+              <p>
+                mcchat separates global chat into channels based on two player settings:
+                <span class="inline">country</span> and <span class="inline">frequency</span>.
+                When a player chats, only recipients in the same country and frequency will receive that message.
+              </p>
+            </div>
+            <div class="card">
+              <h3>defaults</h3>
+              <div class="kv">
+                <div>country</div>
+                <div><span class="inline">WW</span></div>
+                <div>frequency</div>
+                <div><span class="inline">1</span></div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section id="how-it-works" class="section">
+          <h2>how it works</h2>
+          <div class="grid">
+            <div class="card">
+              <h3>join initialization</h3>
+              <p>
+                On player join, mcchat ensures the player has a record in the database and then loads
+                their country/frequency into an in-memory cache.
+              </p>
+              <pre>event: PlayerJoinEvent
+handler: HandlePlayerJoinInitData
+provider: MCChatProvider.initPlayerData(uuid) (async)</pre>
+            </div>
+
+            <div class="card">
+              <h3>chat filtering</h3>
+              <p>
+                On chat, mcchat reads sender + recipient channel data from cache and removes any
+                recipients not matching the sender's channel.
+              </p>
+              <pre>event: AsyncPlayerChatEvent
+handler: HandleChatFilter
+rule: same country AND same frequency</pre>
+            </div>
+          </div>
+
+          <div class="note" id="notes">
+            Performance note: chat handling uses cached lookups (no database queries during chat). Filtering cost is proportional
+            to online recipients.
+          </div>
+        </section>
+
+        <section id="commands" class="section">
+          <h2>commands</h2>
+          <div class="grid">
+            <div class="card">
+              <h3>/mcchat help</h3>
+              <p>Shows the help menu.</p>
+              <pre>/mcchat help</pre>
+            </div>
+
+            <div class="card">
+              <h3>/mcchat set</h3>
+              <p>Sets your country or frequency.</p>
+              <pre>/mcchat set country TH
+/mcchat set frequency 1</pre>
+              <div class="kv">
+                <div>permission</div>
+                <div><span class="inline">mcchat.set</span></div>
+                <div>country format</div>
+                <div><span class="inline">2-letter ISO uppercase</span></div>
+                <div>frequency format</div>
+                <div><span class="inline">positive integer</span></div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section id="chat-format" class="section">
+          <h2>chat format</h2>
+          <p>Messages are displayed with channel context:</p>
+          <pre>[country][frequency][player] message</pre>
+          <p>Color formatting:</p>
+          <div class="kv">
+            <div>country</div>
+            <div><span class="inline">red</span></div>
+            <div>frequency</div>
+            <div><span class="inline">sky blue</span></div>
+            <div>player</div>
+            <div><span class="inline">dark gray</span></div>
+          </div>
+        </section>
+
+        <section id="localization" class="section">
+          <h2>localization</h2>
+          <p>
+            Player-facing messages are sent using <span class="inline">Component.translatable</span> with the base key
+            <span class="inline">mcengine.mcchat</span>.
+          </p>
+          <p>
+            Language JSON files are included under <span class="inline">resources/lang/</span>.
+          </p>
+        </section>
+      </div>
+    </main>
+
+    <div id="site-footer"></div>
+
+    <script>
+      async function inject(id, path) {
+        const el = document.getElementById(id);
+        const res = await fetch(path);
+        el.innerHTML = await res.text();
+      }
+
+      inject('site-header', './partials/header.html');
+      inject('site-footer', './partials/footer.html');
+    </script>
+  </body>
+</html>
