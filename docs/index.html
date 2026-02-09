@@ -111,7 +111,7 @@ rule: same country AND same frequency</pre>
           <h2>chat format</h2>
           <p>Messages are displayed with channel context:</p>
           <pre>[country][frequency][player] message</pre>
-          <p>Color formatting:</p>
+          <p>Color formatting (defaults):</p>
           <div class="kv">
             <div>country</div>
             <div><span class="inline">red</span></div>
@@ -120,6 +120,21 @@ rule: same country AND same frequency</pre>
             <div>player</div>
             <div><span class="inline">dark gray</span></div>
           </div>
+
+          <p>All formatting is configurable via <span class="inline">config.yml</span>:</p>
+          <pre>chat:
+  format: "[{country}][{frequency}][{player}] {message}"
+  colors:
+    country: "&amp;c"
+    frequency: "&amp;b"
+    player: "&amp;8"
+    message: "&amp;f"</pre>
+
+          <p>Available placeholders:</p>
+          <pre>{country}
+{frequency}
+{player}
+{message}</pre>
         </section>
 
         <section id="localization" class="section">
